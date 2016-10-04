@@ -145,7 +145,7 @@ namespace EF.Diagnostics.Profiling
         /// <summary>
         /// Default handler for handling exception.
         /// </summary>
-        internal static Action<Exception, object> HandleExceptionHandler = HandleException;
+        public static Action<Exception, object> HandleExceptionHandler { get; set; } = HandleException;
 
         #endregion
 
