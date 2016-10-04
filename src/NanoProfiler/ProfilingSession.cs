@@ -69,15 +69,13 @@ namespace EF.Diagnostics.Profiling
         public static void SetCurrentProfilingSession(
             ProfilingSession session, Guid? parentStepId = null)
         {
-            ProfilingSessionContainer.CurrentSession = null;
-            ProfilingSessionContainer.CurrentSessionStepId = null;
-
-            if (session == null || session.Profiler == null) return;
-
-            var timingSession = session.Profiler.GetTimingSession();
-            if (timingSession == null 
-                || timingSession.Timings == null
-                || timingSession.Timings.All(t => t.ParentId != timingSession.Id)) return;
+            var timingSession = session?.Profiler?.GetTimingSession();
+            if (timingSession?.Timings == null || timingSession.Timings.All(t => t.ParentId != timingSession.Id))
+            {
+                ProfilingSessionContainer.CurrentSession = null;
+                ProfilingSessionContainer.CurrentSessionStepId = null;
+                return;
+            }
 
             ProfilingSessionContainer.CurrentSession = session;
 
