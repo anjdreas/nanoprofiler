@@ -188,7 +188,7 @@ namespace EF.Diagnostics.Profiling
         /// </summary>
         /// <param name="name">The name of the profiling session.</param>
         /// <param name="tags">The tags of the profiling session.</param>
-        public static void Start(string name, params string[] tags)
+        public static ProfilingSession Start(string name, params string[] tags)
         {
             if (string.IsNullOrEmpty(name))
             {
@@ -207,24 +207,25 @@ namespace EF.Diagnostics.Profiling
                 foreach (var filter in ProfilingFilters)
                 {
                     if (filter == null) continue;
-                    if (filter.ShouldBeExculded(name, tags)) return;
+                    if (filter.ShouldBeExculded(name, tags)) return null;
                 }
             }
 
-            IProfiler profiler = null;
             try
             {
-                profiler = CreateProfilerHandler(name, _profilingStorage, tags == null || !tags.Any() ? null : new TagCollection(tags));
+                IProfiler profiler = CreateProfilerHandler(name,
+                    _profilingStorage,
+                    tags == null || !tags.Any() ? null : new TagCollection(tags));
+
+                // Create the current ProfilingSession
+                var session = new ProfilingSession(profiler);
+                SetCurrentProfilingSession(session);
+                return session;
             }
             catch (Exception ex)
             {
                 HandleExceptionHandler(ex, typeof(ProfilingSession));
-            }
-
-            if (profiler != null)
-            {
-                // Create the current ProfilingSession
-                _profilingSessionContainer.CurrentSession = new ProfilingSession(profiler);
+                return null;
             }
         }
 
