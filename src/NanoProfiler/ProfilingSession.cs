@@ -195,8 +195,12 @@ namespace EF.Diagnostics.Profiling
                 throw new ArgumentNullException("name");
             }
 
-            // set null the current profiling session if exists
-            ProfilingSession.SetCurrentProfilingSession(null);
+            ProfilingSession current = Current;
+            if (current != null)
+            {
+                // set null the current profiling session if exists
+                SetCurrentProfilingSession(null);
+            }
 
             if (ProfilingFilters.Count > 0)
             {
